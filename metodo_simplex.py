@@ -266,6 +266,10 @@ def terceiro_passo(qtd_variaveis_decisao, qtd_restricoes, matriz_coeficientes_fu
         print('\nSolução: ')
         exibir_matriz(solucao)
 
+        solucao_metodo_simplex = []
+        for i in range(qtd_restricoes):
+            solucao_metodo_simplex.append([0])
+
         finalizando = multiplicar_matrizes(CB, B_inversa)
         resultado_otimo = multiplicar_matrizes(finalizando, b)
         print(f'\nResultado ótimo = {resultado_otimo[0]}')
