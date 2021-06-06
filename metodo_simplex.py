@@ -130,6 +130,12 @@ def matriz_variaveis_base(qtd_restricoes):
         matriz_variaveis_base.append(['S{0}'.format(i+1)])
     return matriz_variaveis_base
 
+def aux_matrix(qtd_restricoes):
+    aux_matrix = []
+    for i in range(qtd_restricoes):
+        aux_matrix.append([qtd_restricoes+i])
+    return aux_matrix
+
 def matriz_coeficientes_negativos_funcao_objetivo(matriz_coeficientes_funcao_objetivo):
     matriz = multiplicar_matriz_numero_real(-1, matriz_coeficientes_funcao_objetivo)
     return matriz
@@ -155,6 +161,7 @@ def segundo_passo(qtd_variaveis_decisao, qtd_restricoes, modo_opcao, funcao_obje
     b = matriz_termos_independentes_restricoes
 
     XB = matriz_variaveis_base(qtd_restricoes)
+    matrix_aux = aux_matrix(qtd_restricoes)
     B = matriz_identidade
     C_negativo = matriz_coeficientes_negativos_funcao_objetivo(matriz_coeficientes_funcao_objetivo)
 
@@ -201,7 +208,7 @@ def segundo_passo(qtd_variaveis_decisao, qtd_restricoes, modo_opcao, funcao_obje
     for _ in range(qtd_restricoes):
         matriz_coeficientes_novas_variaveis_base[0].append(0)
 
-    terceiro_passo(qtd_variaveis_decisao, qtd_restricoes, C, A, b, XB, B, coluna_pivot, indice_entrada, indice_saida, matriz_coeficientes_novas_variaveis_base)
+    terceiro_passo(qtd_variaveis_decisao, qtd_restricoes, C, A, b, XB, matrix_aux, B, coluna_pivot, indice_entrada, indice_saida, matriz_coeficientes_novas_variaveis_base)
 
 def multiplicar_matrizes(matriz1, matriz2):
     if len(matriz1[0]) != len(matriz2):
@@ -229,7 +236,7 @@ def subtrair_matrizes(matriz1, matriz2):
 def checar_maior_que_zero(list1):
     return (all(x > 0 for x in list1))
 
-def terceiro_passo(qtd_variaveis_decisao, qtd_restricoes, matriz_coeficientes_funcao_objetivo, matriz_coeficientes_restricoes, matriz_termos_independentes_restricoes, matriz_variaveis_base, matriz_identidade, coluna_pivot, indice_entrada, indice_saida, matriz_coeficientes_novas_variaveis_base):
+def terceiro_passo(qtd_variaveis_decisao, qtd_restricoes, matriz_coeficientes_funcao_objetivo, matriz_coeficientes_restricoes, matriz_termos_independentes_restricoes, matriz_variaveis_base, aux_matrix, matriz_identidade, coluna_pivot, indice_entrada, indice_saida, matriz_coeficientes_novas_variaveis_base):
     print('\nPASSO 3')
     C = matriz_coeficientes_funcao_objetivo
     A = matriz_coeficientes_restricoes
@@ -239,6 +246,9 @@ def terceiro_passo(qtd_variaveis_decisao, qtd_restricoes, matriz_coeficientes_fu
     nova_XB[indice_saida][0] = 'X' + str(indice_entrada+1)
     print('\nNova matriz das variáveis de base (XB):')
     exibir_matriz(nova_XB)
+
+    nova_matriz_aux = aux_matrix
+    nova_matriz_aux[indice_saida][0] = indice_entrada
 
     B = matriz_identidade
     for i in range(len(coluna_pivot)):
@@ -262,13 +272,19 @@ def terceiro_passo(qtd_variaveis_decisao, qtd_restricoes, matriz_coeficientes_fu
     exibir_matriz(resultado)
 
     if np.all(np.array(resultado) >= 0):
-        solucao = multiplicar_matrizes(B_inversa, b)
-        print('\nSolução: ')
-        exibir_matriz(solucao)
+        solucao_inicial = multiplicar_matrizes(B_inversa, b)
 
         solucao_metodo_simplex = []
-        for i in range(qtd_restricoes):
+        for i in range(qtd_variaveis_decisao):
             solucao_metodo_simplex.append([0])
+        
+        for i in range(len(nova_matriz_aux)):
+            if nova_matriz_aux[i][0] < qtd_variaveis_decisao:
+                solucao_metodo_simplex[nova_matriz_aux[i][0]][0] = solucao_inicial[i]
+        
+        print('\nValores das incógnitas:')
+        for i in range(len(solucao_metodo_simplex)):
+            print(f'X{i+1} = {solucao_metodo_simplex[i][0]}')
 
         finalizando = multiplicar_matrizes(CB, B_inversa)
         resultado_otimo = multiplicar_matrizes(finalizando, b)
@@ -312,5 +328,8 @@ def terceiro_passo(qtd_variaveis_decisao, qtd_restricoes, matriz_coeficientes_fu
         print(f'Menor valor do cálculo: {menor_valor_calculo_passo3}')
         print(f'Quem irá sair: S{indice_saida_passo3+1}')
 
-        terceiro_passo(qtd_variaveis_decisao, qtd_restricoes, C, A, b, nova_XB, B, coluna_pivot_passo3, indice_entrada_passo3, indice_saida_passo3, CB)
+        terceiro_passo(qtd_variaveis_decisao, qtd_restricoes, C, A, b, nova_XB, nova_matriz_aux, B, coluna_pivot_passo3, indice_entrada_passo3, indice_saida_passo3, CB)
+    
+    def solucao_grafica():
+        return
 menu()
