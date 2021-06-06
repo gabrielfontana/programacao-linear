@@ -302,6 +302,10 @@ def terceiro_passo(qtd_variaveis_decisao, qtd_restricoes, modo_opcao, matriz_coe
         finalizando = multiplicar_matrizes(CB, B_inversa)
         resultado_otimo = multiplicar_matrizes(finalizando, b)
         print(f'\nResultado ótimo = {resultado_otimo[0]}')
+
+        if qtd_variaveis_decisao >= 0 and qtd_variaveis_decisao <= 2:
+            solucao_grafica()
+
     else:
         menor_valor_passo3 = 1000000
         indice_entrada_passo3 = 0
@@ -349,6 +353,8 @@ def terceiro_passo(qtd_variaveis_decisao, qtd_restricoes, modo_opcao, matriz_coe
 
         terceiro_passo(qtd_variaveis_decisao, qtd_restricoes, modo_opcao, C, A, b, nova_XB, nova_matriz_aux, B, coluna_pivot_passo3, indice_entrada_passo3, indice_saida_passo3, CB)
     
-    def solucao_grafica():
-        return
+def solucao_grafica():
+    print('true')
+    return
+    
 menu()
